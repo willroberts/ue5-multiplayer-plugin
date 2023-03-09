@@ -7,40 +7,50 @@
 #include "OnlineSubsystem.h"
 #include "Interfaces/OnlineSessionInterface.h"
 
-void UDebugMenu::AddMultiplayerDebugMenu(int32 NumPlayers, FString GameMode, FString LobbyMap)
+/*************
+Public Methods
+*************/
+
+// AddMultiplayerDebugMenu implements the user-facing setup method for new debug menus.
+// This function is callable from Blueprints.
+void UDebugMenu::AddMultiplayerDebugMenu(int32 MaxSearchResults, int32 NumPlayers, FString GameMode, FString LobbyMap)
 {
+    // Save arguments for later reference.
+    SessionSearchLimit = MaxSearchResults;
     NumPublicConnections = NumPlayers;
     MatchType = GameMode;
     LobbyMapPath = FString::Printf(TEXT("%s?listen"), *LobbyMap);
 
+    // Add the widget to the viewport.
     AddToViewport();
     SetVisibility(ESlateVisibility::Visible);
     bIsFocusable = true;
 
+    // Get the player controller from the World.
     UWorld* World = GetWorld();
     if (!World)
     {
         return;
     }
-
     APlayerController* PlayerController = World->GetFirstPlayerController();
     if (!PlayerController)
     {
         return;
     }
 
+    // Configure mouse input for the menu widget.
     FInputModeUIOnly InputModeData;
     InputModeData.SetWidgetToFocus(TakeWidget());
     InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
     PlayerController->SetInputMode(InputModeData);
     PlayerController->SetShowMouseCursor(true);
 
+    // Get the Subsystem from the GameInstance.
     UGameInstance* GameInstance = GetGameInstance();
     if (!GameInstance)
     {
         return;
     }
-
     MultiplayerSessionsSubsystem = GameInstance->GetSubsystem<UMultiplayerSessionsSubsystem>();
     if (!MultiplayerSessionsSubsystem)
     {
@@ -55,6 +65,11 @@ void UDebugMenu::AddMultiplayerDebugMenu(int32 NumPlayers, FString GameMode, FSt
     MultiplayerSessionsSubsystem->MultiplayerOnStartSessionComplete.AddDynamic(this, &ThisClass::OnStartSession);
 }
 
+/****************
+Protected Methods
+****************/
+
+// Initialize adds click handlers to the Host and Join buttons.
 bool UDebugMenu::Initialize()
 {
     if (!Super::Initialize())
@@ -75,12 +90,15 @@ bool UDebugMenu::Initialize()
     return true;
 }
 
+// NativeDestruct calls the custom UDebugMenu::Destroy() function when the parent widget is destroyed.
 void UDebugMenu::NativeDestruct()
 {
-    MenuTeardown();
+    Destroy();
     Super::NativeDestruct();
 }
 
+// OnCreateSession is the delegate callback for session creation.
+// When session creation was successful, initiates server travel to the lobby map.
 void UDebugMenu::OnCreateSession(bool bWasSuccessful)
 {
     if (!bWasSuccessful)
@@ -113,10 +131,11 @@ void UDebugMenu::OnCreateSession(bool bWasSuccessful)
     {
         return;
     }
-
     World->ServerTravel(LobbyMapPath);
 }
 
+// OnFindSessions is the delegate callback for session search.
+// When a valid session is found, initiate a session join.
 void UDebugMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& SessionResults, bool bWasSuccessful)
 {
     if (MultiplayerSessionsSubsystem == nullptr)
@@ -145,6 +164,8 @@ void UDebugMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& Sessio
     }
 }
 
+// OnJoinSession is the delegate callback for session joins.
+// When joining succeeds, initiate client travel to the session's platform-specific connection address.
 void UDebugMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
 {
     if (Result != EOnJoinSessionCompleteResult::Success)
@@ -175,10 +196,15 @@ void UDebugMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
     PlayerController->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
 }
 
+// OnDestroySession is the delegate callback for session destruction.
+// Not yet implemented.
 void UDebugMenu::OnDestroySession(bool bWasSuccessful)
 {
+    return;
 }
 
+// OnStartSession is the delegate callback for session initiation.
+// Not yet implemented.
 void UDebugMenu::OnStartSession(bool bWasSuccessful)
 {
     if (!bWasSuccessful)
@@ -204,19 +230,13 @@ void UDebugMenu::OnStartSession(bool bWasSuccessful)
             FString(TEXT("Started session successfully"))
         );
     }
-
-    /*
-    UWorld* World = GetWorld();
-    if (!World)
-    {
-        return;
-    }
-
-    // Hardcoded!
-    World->ServerTravel("/Game/MultiplayerTesting/Maps/Lobby?listen");
-    */
 }
 
+/**************
+Private Methods
+**************/
+
+// HostButtonClicked temporarily disables the Host button before initiating session creation.
 void UDebugMenu::HostButtonClicked()
 {
     HostButton->SetIsEnabled(false);
@@ -228,6 +248,7 @@ void UDebugMenu::HostButtonClicked()
     MultiplayerSessionsSubsystem->CreateSession(NumPublicConnections, MatchType); 
 }
 
+// JoinButtonClicked temporarily disables the Join button before initiating session search.
 void UDebugMenu::JoinButtonClicked()
 {
     JoinButton->SetIsEnabled(false);
@@ -240,21 +261,24 @@ void UDebugMenu::JoinButtonClicked()
 }
 
 // Destroy the menu widget and return control to the player controller.
-void UDebugMenu::MenuTeardown()
+void UDebugMenu::Destroy()
 {
+    // Remove the Widget from the UI.
     RemoveFromParent();
+
+    // Get the PlayerController from the World.
     UWorld* World = GetWorld();
     if (!World)
     {
         return;
     }
-
     APlayerController* PlayerController = World->GetFirstPlayerController();
     if (!PlayerController)
     {
         return;
     }
 
+    // Return input control to the player.
     FInputModeGameOnly InputModeData;
     PlayerController->SetInputMode(InputModeData);
     PlayerController->SetShowMouseCursor(false);

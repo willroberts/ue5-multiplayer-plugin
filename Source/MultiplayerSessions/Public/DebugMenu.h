@@ -8,8 +8,10 @@
 
 #include "DebugMenu.generated.h"
 
-/**
- * 
+/*
+ * UDebugMenu provides a widget with buttons for hosting and joining games.
+ * The menu binds a series of custom delegate callbacks used for session management.
+ * When creating the widget, callers can provide the number of players, game mode, and lobby map for the session.
  */
 UCLASS()
 class MULTIPLAYERSESSIONS_API UDebugMenu : public UUserWidget
@@ -19,16 +21,17 @@ class MULTIPLAYERSESSIONS_API UDebugMenu : public UUserWidget
 public:
 	UFUNCTION(BlueprintCallable)
 	void AddMultiplayerDebugMenu(
-		int32 NumPlayers = 4,
-		FString GameMode = FString(TEXT("FreeForAll")),
-		FString LobbyMap = FString(TEXT(""))
+		int32 MaxSearchResults = 1000,
+		int32 NumPlayers = 8,
+		FString GameMode = FString(TEXT("YourGameMode")),
+		FString LobbyMap = FString(TEXT("YourLobbyMap"))
 	);
 
 protected:
 	virtual bool Initialize() override;
-	virtual void NativeDestruct() override; /* Replaced OnLevelRemovedFromWorld() in UE 5.1 */
 
-	// Custom delegate callbacks.
+	// Replaced OnLevelRemovedFromWorld() in UE 5.1.
+	virtual void NativeDestruct() override;
 
 	UFUNCTION()
 	void OnCreateSession(bool bWasSuccessful);
@@ -58,11 +61,11 @@ private:
 	UFUNCTION()
 	void JoinButtonClicked();
 
-	void MenuTeardown();
+	void Destroy();
 
 	class UMultiplayerSessionsSubsystem* MultiplayerSessionsSubsystem;
-
-	int32 NumPublicConnections{4};
-	FString MatchType{TEXT("FreeForAll")};
+	int32 SessionSearchLimit{0};
+	int32 NumPublicConnections{0};
+	FString MatchType{TEXT("")};
 	FString LobbyMapPath{TEXT("")};
 };

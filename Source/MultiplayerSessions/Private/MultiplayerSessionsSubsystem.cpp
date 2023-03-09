@@ -86,7 +86,7 @@ void UMultiplayerSessionsSubsystem::FindSessions(int32 MaxSearchResults)
     {
         // Clear the current delegate.
         SessionInterface->ClearOnFindSessionsCompleteDelegate_Handle(FindSessionsCompleteDelegateHandle);
-        // Broadcast our own delegate.
+        // Broadcast the custom delegate.
         MultiplayerOnFindSessionsComplete.Broadcast(TArray<FOnlineSessionSearchResult>(), false);
         return; // ?
     }
