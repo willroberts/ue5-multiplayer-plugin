@@ -6,19 +6,19 @@
 #include "Blueprint/UserWidget.h"
 #include "Interfaces/OnlineSessionInterface.h"
 
-#include "Menu.generated.h"
+#include "DebugMenu.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MULTIPLAYERSESSIONS_API UMenu : public UUserWidget
+class MULTIPLAYERSESSIONS_API UDebugMenu : public UUserWidget
 {
 	GENERATED_BODY()
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void MenuSetup(
+	void AddMultiplayerDebugMenu(
 		int32 NumPlayers = 4,
 		FString GameMode = FString(TEXT("FreeForAll")),
 		FString LobbyMap = FString(TEXT(""))
@@ -26,7 +26,7 @@ public:
 
 protected:
 	virtual bool Initialize() override;
-	virtual void NativeDestruct() override; /* Replaced OnLevelRemovedFromWorld() in UE 5.1+ */
+	virtual void NativeDestruct() override; /* Replaced OnLevelRemovedFromWorld() in UE 5.1 */
 
 	// Custom delegate callbacks.
 
