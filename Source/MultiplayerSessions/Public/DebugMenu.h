@@ -49,6 +49,14 @@ protected:
 	void OnStartSession(bool bWasSuccessful);
 
 private:
+	void Destroy();
+
+	class UMultiplayerSessionsSubsystem* MultiplayerSessionsSubsystem;
+
+	/********************
+	Host and Join buttons
+	********************/
+
 	UPROPERTY(meta = (BindWidget))
 	class UButton* HostButton;
 
@@ -61,9 +69,10 @@ private:
 	UFUNCTION()
 	void JoinButtonClicked();
 
-	void Destroy();
+	/************************
+	Saved Session Information
+	************************/
 
-	class UMultiplayerSessionsSubsystem* MultiplayerSessionsSubsystem;
 	int32 SessionSearchLimit{0};
 	int32 NumPublicConnections{0};
 	FString MatchType{TEXT("")};

@@ -32,11 +32,13 @@ void UDebugMenu::AddMultiplayerDebugMenu(int32 MaxSearchResults, int32 NumPlayer
     UWorld* World = GetWorld();
     if (!World)
     {
+        Logger::Log(FString(TEXT("DebugMenu: Failed to get World")), true);
         return;
     }
     APlayerController* PlayerController = World->GetFirstPlayerController();
     if (!PlayerController)
     {
+        Logger::Log(FString(TEXT("DebugMenu: Failed to get PlayerController")), true);
         return;
     }
 
@@ -51,11 +53,13 @@ void UDebugMenu::AddMultiplayerDebugMenu(int32 MaxSearchResults, int32 NumPlayer
     UGameInstance* GameInstance = GetGameInstance();
     if (!GameInstance)
     {
+        Logger::Log(FString(TEXT("DebugMenu: Failed to get GameInstance")), true);
         return;
     }
     MultiplayerSessionsSubsystem = GameInstance->GetSubsystem<UMultiplayerSessionsSubsystem>();
     if (!MultiplayerSessionsSubsystem)
     {
+        Logger::Log(FString(TEXT("DebugMenu: Failed to get MultiplayerSessionSubsystem")), true);
         return;
     }
 
@@ -76,15 +80,24 @@ bool UDebugMenu::Initialize()
 {
     if (!Super::Initialize())
     {
+        Logger::Log(FString(TEXT("Initialize: Failed to initialize DebugMenu")), true);
         return false;
     }
 
-    if (HostButton)
+    if (!HostButton)
+    {
+        Logger::Log(FString(TEXT("Initialize: HostButton not found")), true);
+    }
+    else
     {
         HostButton->OnClicked.AddDynamic(this, &UDebugMenu::HostButtonClicked);
     }
 
-    if (JoinButton)
+    if (!JoinButton)
+    {
+        Logger::Log(FString(TEXT("Initialize: HostButton not found")), true);
+    }
+    else
     {
         JoinButton->OnClicked.AddDynamic(this, &UDebugMenu::JoinButtonClicked);
     }
@@ -105,15 +118,16 @@ void UDebugMenu::OnCreateSession(bool bWasSuccessful)
 {
     if (!bWasSuccessful)
     {
-        Logger::Log(FString(TEXT("Failed to create session")), true);
+        Logger::Log(FString(TEXT("OnCreateSession: Failed to create session")), true);
         HostButton->SetIsEnabled(true);
         return;
     }
-    Logger::Log(FString(TEXT("Created session successfully")), false);
+    Logger::Log(FString(TEXT("OnCreateSession: Created session successfully")), false);
 
     UWorld* World = GetWorld();
     if (!World)
     {
+        Logger::Log(FString(TEXT("OnCreateSession: Failed to get World")), true);
         return;
     }
     World->ServerTravel(LobbyMapPath);
@@ -123,14 +137,16 @@ void UDebugMenu::OnCreateSession(bool bWasSuccessful)
 // When a valid session is found, initiate a session join.
 void UDebugMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& SessionResults, bool bWasSuccessful)
 {
-    if (MultiplayerSessionsSubsystem == nullptr)
+    if (!bWasSuccessful || SessionResults.Num() == 0)
     {
+        Logger::Log(FString(TEXT("OnFindSessions: No sessions found")), true);
+        JoinButton->SetIsEnabled(true);
         return;
     }
 
-    if (!bWasSuccessful || SessionResults.Num() == 0)
+    if (MultiplayerSessionsSubsystem == nullptr)
     {
-        JoinButton->SetIsEnabled(true);
+        Logger::Log(FString(TEXT("OnFindSessions: Failed to get MultiplayerSessionsSubsystem")), true);
         return;
     }
 
@@ -143,39 +159,48 @@ void UDebugMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& Sessio
             continue;
         }
 
-        // Join the session.
         MultiplayerSessionsSubsystem->JoinSession(Result);
         return;
     }
+
+    Logger::Log(FString(TEXT("OnFindSessions: No sessions matched")), true);
 }
 
 // OnJoinSession is the delegate callback for session joins.
 // When joining succeeds, initiate client travel to the session's platform-specific connection address.
 void UDebugMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
 {
+    // Check the result of the call.
     if (Result != EOnJoinSessionCompleteResult::Success)
     {
         JoinButton->SetIsEnabled(true);
+        Logger::Log(FString(TEXT("OnJoinSession: Failed to join session")), true);
         return;
     }
 
-    IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
-    if (!Subsystem)
+    // Get a pointer to the SessionInterface from the OnlineSubsystem.
+    IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
+    if (!OnlineSubsystem)
     {
+        Logger::Log(FString(TEXT("OnJoinSession: Failed to get OnlineSubsystem")), true);
         return;
     }
-
-    IOnlineSessionPtr SessionInterface = Subsystem->GetSessionInterface();
+    IOnlineSessionPtr SessionInterface = OnlineSubsystem->GetSessionInterface();
     if (!SessionInterface.IsValid())
     {
+        Logger::Log(FString(TEXT("OnJoinSession: Failed to get SessionInterface")), true);
         return;
     }
+
+    // Get the platform-specific address of the session.
     FString Address;
     SessionInterface->GetResolvedConnectString(NAME_GameSession, Address);
 
+    // Get the PlayerController and initiate client travel to the session.
     APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController();
     if (!PlayerController)
     {
+        Logger::Log(FString(TEXT("OnJoinSession: Failed to get PlayerController")), true);
         return;
     }
     PlayerController->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
@@ -185,7 +210,12 @@ void UDebugMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
 // Not yet implemented.
 void UDebugMenu::OnDestroySession(bool bWasSuccessful)
 {
-    return;
+    if (!bWasSuccessful)
+    {
+        Logger::Log(FString(TEXT("OnDestroySession: Failed to destroy session")), true);
+        return;
+    }
+    Logger::Log(FString(TEXT("OnDestroySession: Destroyed session successfully")), false);
 }
 
 // OnStartSession is the delegate callback for session initiation.
@@ -194,15 +224,41 @@ void UDebugMenu::OnStartSession(bool bWasSuccessful)
 {
     if (!bWasSuccessful)
     {
-        Logger::Log(FString(TEXT("Failed to start session")), true);
+        Logger::Log(FString(TEXT("OnStartSession: Failed to start session")), true);
         return;
     }
-    Logger::Log(FString(TEXT("Started session successfully")), false);
+    Logger::Log(FString(TEXT("OnStartSession: Started session successfully")), false);
 }
 
 /**************
 Private Methods
 **************/
+
+// Destroy the menu widget and return control to the player controller.
+void UDebugMenu::Destroy()
+{
+    // Remove the Widget from the UI.
+    RemoveFromParent();
+
+    // Get the PlayerController from the World.
+    UWorld* World = GetWorld();
+    if (!World)
+    {
+        Logger::Log(FString(TEXT("Destroy: Failed to get World")), false);
+        return;
+    }
+    APlayerController* PlayerController = World->GetFirstPlayerController();
+    if (!PlayerController)
+    {
+        Logger::Log(FString(TEXT("Destroy: Failed to get PlayerController")), false);
+        return;
+    }
+
+    // Return input control to the player.
+    FInputModeGameOnly InputModeData;
+    PlayerController->SetInputMode(InputModeData);
+    PlayerController->SetShowMouseCursor(false);
+}
 
 // HostButtonClicked temporarily disables the Host button before initiating session creation.
 void UDebugMenu::HostButtonClicked()
@@ -211,6 +267,7 @@ void UDebugMenu::HostButtonClicked()
 
     if (!MultiplayerSessionsSubsystem)
     {
+        Logger::Log(FString(TEXT("HostButtonClicked: Failed to get MultiplayerSessionsSubsystem")), false);
         return;
     }
     MultiplayerSessionsSubsystem->CreateSession(NumPublicConnections, MatchType); 
@@ -223,31 +280,8 @@ void UDebugMenu::JoinButtonClicked()
 
     if (!MultiplayerSessionsSubsystem)
     {
+        Logger::Log(FString(TEXT("JoinButtonClicked: Failed to get MultiplayerSessionsSubsystem")), false);
         return;
     }
     MultiplayerSessionsSubsystem->FindSessions(10000);
-}
-
-// Destroy the menu widget and return control to the player controller.
-void UDebugMenu::Destroy()
-{
-    // Remove the Widget from the UI.
-    RemoveFromParent();
-
-    // Get the PlayerController from the World.
-    UWorld* World = GetWorld();
-    if (!World)
-    {
-        return;
-    }
-    APlayerController* PlayerController = World->GetFirstPlayerController();
-    if (!PlayerController)
-    {
-        return;
-    }
-
-    // Return input control to the player.
-    FInputModeGameOnly InputModeData;
-    PlayerController->SetInputMode(InputModeData);
-    PlayerController->SetShowMouseCursor(false);
 }

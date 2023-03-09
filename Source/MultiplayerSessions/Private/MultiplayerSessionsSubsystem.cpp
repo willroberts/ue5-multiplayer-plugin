@@ -4,6 +4,8 @@
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
 
+#include "Logger.h"
+
 UMultiplayerSessionsSubsystem::UMultiplayerSessionsSubsystem():
     CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete)),
     FindSessionsCompleteDelegate(FOnFindSessionsCompleteDelegate::CreateUObject(this, &ThisClass::OnFindSessionsComplete)),
