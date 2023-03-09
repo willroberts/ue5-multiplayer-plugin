@@ -1,11 +1,13 @@
 // © 2023 Will Roberts
 
-#include "DebugMenu.h"
 #include "Components/Button.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "MultiplayerSessionsSubsystem.h"
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
-#include "Interfaces/OnlineSessionInterface.h"
+
+#include "DebugMenu.h"
+#include "Logger.h"
 
 /*************
 Public Methods
@@ -103,28 +105,11 @@ void UDebugMenu::OnCreateSession(bool bWasSuccessful)
 {
     if (!bWasSuccessful)
     {
-        if (GEngine)
-        {
-            GEngine->AddOnScreenDebugMessage(
-                -1,
-                15.f,
-                FColor::Red,
-                FString(TEXT("Failed to create session"))
-            );
-        }
+        Logger::Log(FString(TEXT("Failed to create session")), true);
         HostButton->SetIsEnabled(true);
         return;
     }
-
-    if (GEngine)
-    {
-        GEngine->AddOnScreenDebugMessage(
-            -1,
-            15.f,
-            FColor::Purple,
-            FString(TEXT("Created session successfully"))
-        );
-    }
+    Logger::Log(FString(TEXT("Created session successfully")), false);
 
     UWorld* World = GetWorld();
     if (!World)
@@ -209,27 +194,10 @@ void UDebugMenu::OnStartSession(bool bWasSuccessful)
 {
     if (!bWasSuccessful)
     {
-        if (GEngine)
-        {
-            GEngine->AddOnScreenDebugMessage(
-                -1,
-                15.f,
-                FColor::Red,
-                FString(TEXT("Failed to start session"))
-            );
-        }
+        Logger::Log(FString(TEXT("Failed to start session")), true);
         return;
     }
-
-    if (GEngine)
-    {
-        GEngine->AddOnScreenDebugMessage(
-            -1,
-            15.f,
-            FColor::Purple,
-            FString(TEXT("Started session successfully"))
-        );
-    }
+    Logger::Log(FString(TEXT("Started session successfully")), false);
 }
 
 /**************
