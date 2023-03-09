@@ -1,14 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
-#include "DebugMenu.h"
+#include "Menu.h"
 #include "Components/Button.h"
 #include "MultiplayerSessionsSubsystem.h"
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
 #include "Interfaces/OnlineSessionInterface.h"
 
-void UDebugMenu::AddMultiplayerDebugMenu(int32 NumPlayers, FString GameMode, FString LobbyMap)
+void UMenu::AddMultiplayerDebugMenu(int32 NumPlayers, FString GameMode, FString LobbyMap)
 {
     NumPublicConnections = NumPlayers;
     MatchType = GameMode;
@@ -56,7 +55,7 @@ void UDebugMenu::AddMultiplayerDebugMenu(int32 NumPlayers, FString GameMode, FSt
     MultiplayerSessionsSubsystem->MultiplayerOnStartSessionComplete.AddDynamic(this, &ThisClass::OnStartSession);
 }
 
-bool UDebugMenu::Initialize()
+bool UMenu::Initialize()
 {
     if (!Super::Initialize())
     {
@@ -65,24 +64,24 @@ bool UDebugMenu::Initialize()
 
     if (HostButton)
     {
-        HostButton->OnClicked.AddDynamic(this, &UDebugMenu::HostButtonClicked);
+        HostButton->OnClicked.AddDynamic(this, &UMenu::HostButtonClicked);
     }
 
     if (JoinButton)
     {
-        JoinButton->OnClicked.AddDynamic(this, &UDebugMenu::JoinButtonClicked);
+        JoinButton->OnClicked.AddDynamic(this, &UMenu::JoinButtonClicked);
     }
 
     return true;
 }
 
-void UDebugMenu::NativeDestruct()
+void UMenu::NativeDestruct()
 {
     MenuTeardown();
     Super::NativeDestruct();
 }
 
-void UDebugMenu::OnCreateSession(bool bWasSuccessful)
+void UMenu::OnCreateSession(bool bWasSuccessful)
 {
     if (!bWasSuccessful)
     {
@@ -118,7 +117,7 @@ void UDebugMenu::OnCreateSession(bool bWasSuccessful)
     World->ServerTravel(LobbyMapPath);
 }
 
-void UDebugMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& SessionResults, bool bWasSuccessful)
+void UMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& SessionResults, bool bWasSuccessful)
 {
     if (MultiplayerSessionsSubsystem == nullptr)
     {
@@ -146,7 +145,7 @@ void UDebugMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& Sessio
     }
 }
 
-void UDebugMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
+void UMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
 {
     if (Result != EOnJoinSessionCompleteResult::Success)
     {
@@ -176,11 +175,11 @@ void UDebugMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
     PlayerController->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
 }
 
-void UDebugMenu::OnDestroySession(bool bWasSuccessful)
+void UMenu::OnDestroySession(bool bWasSuccessful)
 {
 }
 
-void UDebugMenu::OnStartSession(bool bWasSuccessful)
+void UMenu::OnStartSession(bool bWasSuccessful)
 {
     if (!bWasSuccessful)
     {
@@ -218,7 +217,7 @@ void UDebugMenu::OnStartSession(bool bWasSuccessful)
     */
 }
 
-void UDebugMenu::HostButtonClicked()
+void UMenu::HostButtonClicked()
 {
     HostButton->SetIsEnabled(false);
 
@@ -229,7 +228,7 @@ void UDebugMenu::HostButtonClicked()
     MultiplayerSessionsSubsystem->CreateSession(NumPublicConnections, MatchType); 
 }
 
-void UDebugMenu::JoinButtonClicked()
+void UMenu::JoinButtonClicked()
 {
     JoinButton->SetIsEnabled(false);
 
@@ -241,7 +240,7 @@ void UDebugMenu::JoinButtonClicked()
 }
 
 // Destroy the menu widget and return control to the player controller.
-void UDebugMenu::MenuTeardown()
+void UMenu::MenuTeardown()
 {
     RemoveFromParent();
     UWorld* World = GetWorld();

@@ -6,13 +6,13 @@
 #include "Blueprint/UserWidget.h"
 #include "Interfaces/OnlineSessionInterface.h"
 
-#include "DebugMenu.generated.h"
+#include "Menu.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MULTIPLAYERSESSIONS_API UDebugMenu : public UUserWidget
+class MULTIPLAYERSESSIONS_API UMenu : public UUserWidget
 {
 	GENERATED_BODY()
 
