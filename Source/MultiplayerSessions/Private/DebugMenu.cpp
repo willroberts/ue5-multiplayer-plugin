@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// © 2023 Will Roberts
 
 #include "DebugMenu.h"
 #include "Components/Button.h"
