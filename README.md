@@ -74,6 +74,8 @@ After installing and configuring the plugin, use the `WBP_DebugMenu` asset to te
 
 Once this is done, opening your default map will show the multiplayer debug menu, which you can use to host or join sessions.
 
+You can also use the included `DebugGameMode`, which will print player names and counts as they join or leave the session.
+
 Additionally, the `DebugMenu` C++ class serves as a reference implementation of the plugin's functionality.
 
 ## Planned Improvements
