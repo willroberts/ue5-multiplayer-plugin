@@ -134,8 +134,8 @@ void UDebugMenu::OnCreateSession(bool bWasSuccessful)
         return;
     }
 
-    Logger::Log(FString(TEXT("OnCreateSession: Initiating server travel")), false);
-    bWasSuccessful = World->ServerTravel(LobbyMapPath);
+    Logger::Log(FString::Printf(TEXT("OnCreateSession: Initiating server travel to map %s"), *LobbyMapPath), false);
+    bWasSuccessful = World->ServerTravel(*LobbyMapPath);
     if (!bWasSuccessful)
     {
         Logger::Log(FString(TEXT("OnCreateSession: Server travel failed")), true);
