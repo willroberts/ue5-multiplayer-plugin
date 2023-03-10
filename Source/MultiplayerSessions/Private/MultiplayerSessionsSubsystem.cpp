@@ -40,7 +40,7 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
     auto ExistingSession = SessionInterface->GetNamedSession(NAME_GameSession);
     if (!ExistingSession)
     {
-        Logger::Log(FString(TEXT("Destroying existing session...")), false);
+        Logger::Log(FString(TEXT("CreateSession: Destroying existing session...")), false);
         bCreateSessionOnDestroy = true;
         LastNumPublicConnections = NumPublicConnections;
         LastMatchType = MatchType;
@@ -108,7 +108,6 @@ void UMultiplayerSessionsSubsystem::JoinSession(const FOnlineSessionSearchResult
 {
     if (!SessionInterface.IsValid())
     {
-        Logger::Log(FString(TEXT("JoinSession: Failed to get SessionInterface")), true);
         MultiplayerOnJoinSessionComplete.Broadcast(EOnJoinSessionCompleteResult::UnknownError);
         return;
     }
@@ -118,7 +117,6 @@ void UMultiplayerSessionsSubsystem::JoinSession(const FOnlineSessionSearchResult
     bool bWasSuccessful = SessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, SessionResult);
     if (!bWasSuccessful)
     {
-        Logger::Log(FString(TEXT("JoinSession: Failed to join session")), true);
         SessionInterface->ClearOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegateHandle);
         MultiplayerOnJoinSessionComplete.Broadcast(EOnJoinSessionCompleteResult::UnknownError);
     }
@@ -129,7 +127,6 @@ void UMultiplayerSessionsSubsystem::DestroySession()
 {
     if (!SessionInterface.IsValid())
     {
-        Logger::Log(FString(TEXT("DestroySession: Failed to get SessionInterface")), true);
         MultiplayerOnDestroySessionComplete.Broadcast(false);
         return;
     }
@@ -138,7 +135,6 @@ void UMultiplayerSessionsSubsystem::DestroySession()
     bool bWasSuccessful = SessionInterface->DestroySession(NAME_GameSession);
     if (!bWasSuccessful)
     {
-        Logger::Log(FString(TEXT("DestroySession: Failed to destroy session")), true);
         SessionInterface->ClearOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegateHandle);
         MultiplayerOnDestroySessionComplete.Broadcast(false);
     }
@@ -149,7 +145,6 @@ void UMultiplayerSessionsSubsystem::StartSession()
 {
     if (!SessionInterface.IsValid())
     {
-        Logger::Log(FString(TEXT("StartSession: Failed to get SessionInterface")), true);
         MultiplayerOnStartSessionComplete.Broadcast(false);
         return;
     }
@@ -158,7 +153,6 @@ void UMultiplayerSessionsSubsystem::StartSession()
     bool bWasSuccessful = SessionInterface->StartSession(NAME_GameSession);
     if (!bWasSuccessful)
     {
-        Logger::Log(FString(TEXT("StartSession: Failed to start session")), true);
         SessionInterface->ClearOnStartSessionCompleteDelegate_Handle(StartSessionCompleteDelegateHandle);
         MultiplayerOnStartSessionComplete.Broadcast(false);
     }
@@ -177,7 +171,6 @@ void UMultiplayerSessionsSubsystem::OnCreateSessionComplete(FName SessionName, b
         return;
     }
 
-    Logger::Log(FString(TEXT("Created session")), false);
     SessionInterface->ClearOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegateHandle);
     MultiplayerOnCreateSessionComplete.Broadcast(bWasSuccessful);
 }
@@ -194,7 +187,6 @@ void UMultiplayerSessionsSubsystem::OnFindSessionsComplete(bool bWasSuccessful)
 
     if (LastSessionSearch->SearchResults.Num() <= 0)
     {
-        Logger::Log(FString(TEXT("OnFindSessionsComplete: No results found")), true);
         MultiplayerOnFindSessionsComplete.Broadcast(TArray<FOnlineSessionSearchResult>(), false);
         return;
     }
@@ -212,7 +204,6 @@ void UMultiplayerSessionsSubsystem::OnJoinSessionComplete(FName SessionName, EOn
     }
     SessionInterface->ClearOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegateHandle);
 
-    Logger::Log(FString(TEXT("Joined session")), false);
     MultiplayerOnJoinSessionComplete.Broadcast(Result);
 }
 
@@ -229,6 +220,7 @@ void UMultiplayerSessionsSubsystem::OnDestroySessionComplete(FName SessionName, 
 
     if (bWasSuccessful && bCreateSessionOnDestroy)
     {
+        Logger::Log(FString(TEXT("OnDestroySessionComplete: Automatically creating new session")), false);
         bCreateSessionOnDestroy = false;
         CreateSession(LastNumPublicConnections, LastMatchType);
     }
