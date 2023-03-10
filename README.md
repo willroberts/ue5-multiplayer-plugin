@@ -1,17 +1,54 @@
 # Multiplayer Session Plugin for Unreal Engine
 
-This plugin provides an implementation of the Online Subsystem using the Steam provider.
+This plugin provides an implementation of Unreal Engine's Online Subsystem.
 
-When using the plugin, players can host and join games when logged into Steam. The hosting player will act as a listen server, resulting in a peer-to-peer network topology.
+When using the plugin, players can host and join multiplayer games over the Internet. The hosting player will act as a listen server, resulting in a peer-to-peer network topology.
 
 The plugin also provides a debug menu, and a corresponding Widget for the debug menu.
 
-Dedicated server functionality is planned. Support for Epic Online Services (as an alternative to Steam) is also planned.
+Dedicated server functionality is planned. Support for Epic Online Services is also planned.
 
-Developed with Unreal Engine 5.1 and C++.
+Developed with Unreal Engine 5.1 and modern C++.
 
-## Usage
+## Functionality
 
-After adding the plugin to your project, use the `WBP_DebugMenu` asset to test functionality.
+When playing in editor, or with development/debug builds, the OnlineSubsystem will be `NULL`, resulting in using LAN for connections.
 
-The `DebugMenu` C++ class serves as a reference implementation of the plugin.
+When packaging or launching the project, the project's default OnlineSubsystem will be used. The Steam OnlineSubsystem is recommended.
+
+The plugin can be used to create, start, find, join, or destroy multiplayer sessions.
+
+## Installation
+
+To install the plugin, simply copy the contents of this repository to the `Plugins/` folder in your project. You can clone the repo, or download an archive from the Releases page.
+
+This plugin may be offered on the Unreal Marketplace in a future update, to further simplify installation.
+
+After reopening the project, you will be prompted to rebuild the plugin.
+
+## Configuration
+
+Before using the plugin, there are some changes which must be made in the project:
+
+1. Enable the `Online Subsystem Steam` plugin.
+2. Update `Config/DefaultEngine.ini` according to [the `Online Subsystem Steam` docs](https://docs.unrealengine.com/5.1/en-US/ProgrammingAndScripting/Online/Steam/).
+3. Update `Config/DefaultGame.ini` to add the following:
+
+```ini
+[/Script/Engine.GameSession]
+MaxPlayers=64
+```
+
+## Implementation
+
+The following steps assume your project has both a default map and a lobby map already created. If not, create those maps as needed and ensure they're included in the packaged build of the project.
+
+After installing and configuring the plugin, use the `WBP_DebugMenu` asset to test functionality:
+
+1. Open the Level Blueprint for your project's Startup/Default Map.
+2. Use the BeginPlay node to call `Create Widget`, creating a widget of type `WBP_DebugMenu`.
+3. Use the Widget to call the `Add Multiplayer Debug Menu` function, providing the game mode and lobby map path.
+
+Once this is done, opening your default map will show the multiplayer debug menu, which you can use to host or join sessions.
+
+Additionally, the `DebugMenu` C++ class serves as a reference implementation of the plugin's functionality.
