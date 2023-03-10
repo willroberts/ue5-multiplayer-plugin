@@ -143,7 +143,7 @@ void UDebugMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& Sessio
         return;
     }
 
-    if (MultiplayerSessionsSubsystem == nullptr)
+    if (!MultiplayerSessionsSubsystem)
     {
         Logger::Log(FString(TEXT("OnFindSessions: Failed to get MultiplayerSessionsSubsystem")), true);
         return;

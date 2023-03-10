@@ -38,7 +38,7 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
     }
 
     auto ExistingSession = SessionInterface->GetNamedSession(NAME_GameSession);
-    if (ExistingSession != nullptr)
+    if (!ExistingSession)
     {
         Logger::Log(FString(TEXT("Destroying existing session...")), false);
         bCreateSessionOnDestroy = true;
@@ -62,14 +62,13 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
     LastSessionSettings->Set(FName("MatchType"), MatchType, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 
     const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
-    bool WasSuccessful = SessionInterface->CreateSession(
+    bool bWasSuccessful = SessionInterface->CreateSession(
         *LocalPlayer->GetPreferredUniqueNetId(),
         NAME_GameSession,
         *LastSessionSettings
     );
-    if (!WasSuccessful)
+    if (!bWasSuccessful)
     {
-        Logger::Log(FString(TEXT("CreateSession: Failed to create session")), true);
         SessionInterface->ClearOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegateHandle);
         MultiplayerOnCreateSessionComplete.Broadcast(false);
     }
@@ -93,10 +92,9 @@ void UMultiplayerSessionsSubsystem::FindSessions(int32 MaxSearchResults)
 
     // Use first local player's unique net ID to find sessions.
     const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
-    bool Successful = SessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), LastSessionSearch.ToSharedRef());
-    if (!Successful)
+    bool bWasSuccessful = SessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), LastSessionSearch.ToSharedRef());
+    if (!bWasSuccessful)
     {
-        Logger::Log(FString(TEXT("FindSessions: Failed to find sessions")), true);
         // Clear the current delegate.
         SessionInterface->ClearOnFindSessionsCompleteDelegate_Handle(FindSessionsCompleteDelegateHandle);
         // Broadcast the custom delegate.
@@ -117,8 +115,8 @@ void UMultiplayerSessionsSubsystem::JoinSession(const FOnlineSessionSearchResult
     JoinSessionCompleteDelegateHandle = SessionInterface->AddOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegate);
     
     const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
-    bool Successful = SessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, SessionResult);
-    if (!Successful)
+    bool bWasSuccessful = SessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, SessionResult);
+    if (!bWasSuccessful)
     {
         Logger::Log(FString(TEXT("JoinSession: Failed to join session")), true);
         SessionInterface->ClearOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegateHandle);
@@ -137,8 +135,8 @@ void UMultiplayerSessionsSubsystem::DestroySession()
     }
     DestroySessionCompleteDelegateHandle = SessionInterface->AddOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegate);
 
-    bool Successful = SessionInterface->DestroySession(NAME_GameSession);
-    if (!Successful)
+    bool bWasSuccessful = SessionInterface->DestroySession(NAME_GameSession);
+    if (!bWasSuccessful)
     {
         Logger::Log(FString(TEXT("DestroySession: Failed to destroy session")), true);
         SessionInterface->ClearOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegateHandle);
@@ -157,8 +155,8 @@ void UMultiplayerSessionsSubsystem::StartSession()
     }
     StartSessionCompleteDelegateHandle = SessionInterface->AddOnStartSessionCompleteDelegate_Handle(StartSessionCompleteDelegate);
 
-    bool Successful = SessionInterface->StartSession(NAME_GameSession);
-    if (!Successful)
+    bool bWasSuccessful = SessionInterface->StartSession(NAME_GameSession);
+    if (!bWasSuccessful)
     {
         Logger::Log(FString(TEXT("StartSession: Failed to start session")), true);
         SessionInterface->ClearOnStartSessionCompleteDelegate_Handle(StartSessionCompleteDelegateHandle);
@@ -235,7 +233,6 @@ void UMultiplayerSessionsSubsystem::OnDestroySessionComplete(FName SessionName, 
         CreateSession(LastNumPublicConnections, LastMatchType);
     }
 
-    Logger::Log(FString(TEXT("Destroyed session")), false);
     MultiplayerOnDestroySessionComplete.Broadcast(bWasSuccessful);
 }
 
@@ -248,12 +245,5 @@ void UMultiplayerSessionsSubsystem::OnStartSessionComplete(FName SessionName, bo
         return;
     }
     SessionInterface->ClearOnStartSessionCompleteDelegate_Handle(StartSessionCompleteDelegateHandle);
-
-    if (!bWasSuccessful)
-    {
-        Logger::Log(FString(TEXT("OnStartSessionComplete: Failed to start session")), true);
-    }
-
-    Logger::Log(FString(TEXT("Started session")), false);
     MultiplayerOnStartSessionComplete.Broadcast(bWasSuccessful);
 }
