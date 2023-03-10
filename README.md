@@ -78,5 +78,5 @@ Additionally, the `DebugMenu` C++ class serves as a reference implementation of 
 
 ## Planned Improvements
 
-- Dedicated server option
+- Add dedicated server option
 - Publish plugin to Unreal Marketplace
