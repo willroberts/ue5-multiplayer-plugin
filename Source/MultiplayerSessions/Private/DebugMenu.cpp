@@ -218,7 +218,6 @@ void UDebugMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
 }
 
 // OnDestroySession is the delegate callback for session destruction.
-// Not yet implemented.
 void UDebugMenu::OnDestroySession(bool bWasSuccessful)
 {
     if (!bWasSuccessful)
@@ -226,10 +225,10 @@ void UDebugMenu::OnDestroySession(bool bWasSuccessful)
         Logger::Log(FString(TEXT("OnDestroySession: Failed to destroy session")), true);
         return;
     }
+    Logger::Log(FString(TEXT("OnDestroySession: Destroyed session")), false);
 }
 
 // OnStartSession is the delegate callback for session initiation.
-// Not yet implemented.
 void UDebugMenu::OnStartSession(bool bWasSuccessful)
 {
     if (!bWasSuccessful)
@@ -237,6 +236,7 @@ void UDebugMenu::OnStartSession(bool bWasSuccessful)
         Logger::Log(FString(TEXT("OnStartSession: Failed to start session")), true);
         return;
     }
+    Logger::Log(FString(TEXT("OnStartSession: Started session")), false);
 }
 
 /**************
