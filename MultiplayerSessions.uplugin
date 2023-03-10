@@ -6,6 +6,7 @@
 	"Description": "Provides Multiplayer Sessions for UE 5.1",
 	"Category": "Utilities",
 	"CreatedBy": "Will Roberts",
+	"EngineVersion": "5.1.0",
 	"CreatedByURL": "",
 	"DocsURL": "https://github.com/willroberts/ue5-multiplayer-plugin",
 	"MarketplaceURL": "",
