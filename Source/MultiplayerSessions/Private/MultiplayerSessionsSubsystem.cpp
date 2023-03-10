@@ -55,7 +55,7 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
     LastSessionSettings->bAllowJoinViaPresence = true;
     LastSessionSettings->bIsLANMatch = IOnlineSubsystem::Get()->GetSubsystemName() == "NULL" ? true : false;
     LastSessionSettings->bShouldAdvertise = true;
-    LastSessionSettings->bUseLobbiesIfAvailable = true;
+    LastSessionSettings->bUseLobbiesIfAvailable = true; // Needed for UE 5.0+.
     LastSessionSettings->bUsesPresence = true;
     LastSessionSettings->BuildUniqueId = 1; // FIXME: Testing value, to share sessions.
     LastSessionSettings->NumPublicConnections = NumPublicConnections;
