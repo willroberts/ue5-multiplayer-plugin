@@ -19,7 +19,7 @@ class MULTIPLAYERSESSIONS_API UDebugMenu : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category="Utilities")
 	void AddMultiplayerDebugMenu(
 		int32 MaxSearchResults = 1000,
 		int32 NumPlayers = 8,
