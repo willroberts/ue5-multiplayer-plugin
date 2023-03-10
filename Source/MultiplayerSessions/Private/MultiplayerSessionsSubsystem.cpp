@@ -57,11 +57,12 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
     LastSessionSettings->bShouldAdvertise = true;
     LastSessionSettings->bUseLobbiesIfAvailable = true;
     LastSessionSettings->bUsesPresence = true;
-    LastSessionSettings->BuildUniqueId = 1; // For testing, to share sessions.
+    LastSessionSettings->BuildUniqueId = 1; // FIXME: Testing value, to share sessions.
     LastSessionSettings->NumPublicConnections = NumPublicConnections;
     LastSessionSettings->Set(FName("MatchType"), MatchType, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 
     const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
+    Logger::Log(FString(TEXT("CreateSession: Creating session with match type %s", MatchType)), false);
     bool bWasSuccessful = SessionInterface->CreateSession(
         *LocalPlayer->GetPreferredUniqueNetId(),
         NAME_GameSession,
@@ -95,11 +96,8 @@ void UMultiplayerSessionsSubsystem::FindSessions(int32 MaxSearchResults)
     bool bWasSuccessful = SessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), LastSessionSearch.ToSharedRef());
     if (!bWasSuccessful)
     {
-        // Clear the current delegate.
         SessionInterface->ClearOnFindSessionsCompleteDelegate_Handle(FindSessionsCompleteDelegateHandle);
-        // Broadcast the custom delegate.
         MultiplayerOnFindSessionsComplete.Broadcast(TArray<FOnlineSessionSearchResult>(), false);
-        return;
     }
 }
 

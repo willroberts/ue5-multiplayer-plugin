@@ -15,8 +15,12 @@ Public Methods
 
 // AddMultiplayerDebugMenu implements the user-facing setup method for new debug menus.
 // This function is callable from Blueprints.
-void UDebugMenu::AddMultiplayerDebugMenu(int32 MaxSearchResults, int32 NumPlayers, FString GameMode, FString LobbyMap)
-{
+void UDebugMenu::AddMultiplayerDebugMenu(
+    int32 MaxSearchResults,
+    int32 NumPlayers,
+    FString GameMode,
+    FString LobbyMap
+) {
     // Save arguments for later reference.
     SessionSearchLimit = MaxSearchResults;
     NumPublicConnections = NumPlayers;
@@ -280,5 +284,5 @@ void UDebugMenu::JoinButtonClicked()
         Logger::Log(FString(TEXT("JoinButtonClicked: Failed to get MultiplayerSessionsSubsystem")), true);
         return;
     }
-    MultiplayerSessionsSubsystem->FindSessions(10000);
+    MultiplayerSessionsSubsystem->FindSessions(SessionSearchLimit);
 }
