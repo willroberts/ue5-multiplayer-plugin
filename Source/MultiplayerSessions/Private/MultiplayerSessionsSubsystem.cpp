@@ -21,6 +21,7 @@ UMultiplayerSessionsSubsystem::UMultiplayerSessionsSubsystem():
     IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
     if (!OnlineSubsystem)
     {
+        Logger::Log(FString(TEXT("MultiplayerSessionsSubsystem: Failed to get OnlineSubsystem")), true);
         return;
     }
 
@@ -32,12 +33,14 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
 {
     if (!SessionInterface.IsValid())
     {
+        Logger::Log(FString(TEXT("CreateSession: Failed to get SessionInterface")), true);
         return;
     }
 
     auto ExistingSession = SessionInterface->GetNamedSession(NAME_GameSession);
     if (ExistingSession != nullptr)
     {
+        Logger::Log(FString(TEXT("Destroying existing session...")), false);
         bCreateSessionOnDestroy = true;
         LastNumPublicConnections = NumPublicConnections;
         LastMatchType = MatchType;
@@ -66,6 +69,7 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
     );
     if (!WasSuccessful)
     {
+        Logger::Log(FString(TEXT("CreateSession: Failed to create session")), true);
         SessionInterface->ClearOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegateHandle);
         MultiplayerOnCreateSessionComplete.Broadcast(false);
     }
@@ -76,6 +80,7 @@ void UMultiplayerSessionsSubsystem::FindSessions(int32 MaxSearchResults)
 {
     if (!SessionInterface.IsValid())
     {
+        Logger::Log(FString(TEXT("FindSessions: Failed to get SessionInterface")), true);
         return;
     }
 
@@ -91,14 +96,13 @@ void UMultiplayerSessionsSubsystem::FindSessions(int32 MaxSearchResults)
     bool Successful = SessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), LastSessionSearch.ToSharedRef());
     if (!Successful)
     {
-        // log
+        Logger::Log(FString(TEXT("FindSessions: Failed to find sessions")), true);
         // Clear the current delegate.
         SessionInterface->ClearOnFindSessionsCompleteDelegate_Handle(FindSessionsCompleteDelegateHandle);
         // Broadcast the custom delegate.
         MultiplayerOnFindSessionsComplete.Broadcast(TArray<FOnlineSessionSearchResult>(), false);
         return;
     }
-    // log
 }
 
 // JoinSession joins the specified game session with a player's unique ID.
@@ -106,6 +110,7 @@ void UMultiplayerSessionsSubsystem::JoinSession(const FOnlineSessionSearchResult
 {
     if (!SessionInterface.IsValid())
     {
+        Logger::Log(FString(TEXT("JoinSession: Failed to get SessionInterface")), true);
         MultiplayerOnJoinSessionComplete.Broadcast(EOnJoinSessionCompleteResult::UnknownError);
         return;
     }
@@ -115,6 +120,7 @@ void UMultiplayerSessionsSubsystem::JoinSession(const FOnlineSessionSearchResult
     bool Successful = SessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, SessionResult);
     if (!Successful)
     {
+        Logger::Log(FString(TEXT("JoinSession: Failed to join session")), true);
         SessionInterface->ClearOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegateHandle);
         MultiplayerOnJoinSessionComplete.Broadcast(EOnJoinSessionCompleteResult::UnknownError);
     }
@@ -125,6 +131,7 @@ void UMultiplayerSessionsSubsystem::DestroySession()
 {
     if (!SessionInterface.IsValid())
     {
+        Logger::Log(FString(TEXT("DestroySession: Failed to get SessionInterface")), true);
         MultiplayerOnDestroySessionComplete.Broadcast(false);
         return;
     }
@@ -133,6 +140,7 @@ void UMultiplayerSessionsSubsystem::DestroySession()
     bool Successful = SessionInterface->DestroySession(NAME_GameSession);
     if (!Successful)
     {
+        Logger::Log(FString(TEXT("DestroySession: Failed to destroy session")), true);
         SessionInterface->ClearOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegateHandle);
         MultiplayerOnDestroySessionComplete.Broadcast(false);
     }
@@ -143,6 +151,7 @@ void UMultiplayerSessionsSubsystem::StartSession()
 {
     if (!SessionInterface.IsValid())
     {
+        Logger::Log(FString(TEXT("StartSession: Failed to get SessionInterface")), true);
         MultiplayerOnStartSessionComplete.Broadcast(false);
         return;
     }
@@ -151,6 +160,7 @@ void UMultiplayerSessionsSubsystem::StartSession()
     bool Successful = SessionInterface->StartSession(NAME_GameSession);
     if (!Successful)
     {
+        Logger::Log(FString(TEXT("StartSession: Failed to start session")), true);
         SessionInterface->ClearOnStartSessionCompleteDelegate_Handle(StartSessionCompleteDelegateHandle);
         MultiplayerOnStartSessionComplete.Broadcast(false);
     }
@@ -165,9 +175,11 @@ void UMultiplayerSessionsSubsystem::OnCreateSessionComplete(FName SessionName, b
 {
     if (!SessionInterface)
     {
+        Logger::Log(FString(TEXT("OnCreateSessionComplete: Failed to get SessionInterface")), true);
         return;
     }
 
+    Logger::Log(FString(TEXT("Created session")), false);
     SessionInterface->ClearOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegateHandle);
     MultiplayerOnCreateSessionComplete.Broadcast(bWasSuccessful);
 }
@@ -177,15 +189,18 @@ void UMultiplayerSessionsSubsystem::OnFindSessionsComplete(bool bWasSuccessful)
 {
     if (!SessionInterface)
     {
+        Logger::Log(FString(TEXT("OnFindSessionsComplete: Failed to get SessionInterface")), true);
         return;
     }
     SessionInterface->ClearOnFindSessionsCompleteDelegate_Handle(FindSessionsCompleteDelegateHandle);
 
     if (LastSessionSearch->SearchResults.Num() <= 0)
     {
+        Logger::Log(FString(TEXT("OnFindSessionsComplete: No results found")), true);
         MultiplayerOnFindSessionsComplete.Broadcast(TArray<FOnlineSessionSearchResult>(), false);
         return;
     }
+
     MultiplayerOnFindSessionsComplete.Broadcast(LastSessionSearch->SearchResults, bWasSuccessful);
 }
 
@@ -194,9 +209,12 @@ void UMultiplayerSessionsSubsystem::OnJoinSessionComplete(FName SessionName, EOn
 {
     if (!SessionInterface)
     {
+        Logger::Log(FString(TEXT("OnJoinSessionComplete: Failed to get SessionInterface")), true);
         return;
     }
     SessionInterface->ClearOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegateHandle);
+
+    Logger::Log(FString(TEXT("Joined session")), false);
     MultiplayerOnJoinSessionComplete.Broadcast(Result);
 }
 
@@ -206,6 +224,7 @@ void UMultiplayerSessionsSubsystem::OnDestroySessionComplete(FName SessionName, 
 {
     if (!SessionInterface)
     {
+        Logger::Log(FString(TEXT("OnDestroySessionComplete: Failed to get SessionInterface")), true);
         return;
     }
     SessionInterface->ClearOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegateHandle);
@@ -216,6 +235,7 @@ void UMultiplayerSessionsSubsystem::OnDestroySessionComplete(FName SessionName, 
         CreateSession(LastNumPublicConnections, LastMatchType);
     }
 
+    Logger::Log(FString(TEXT("Destroyed session")), false);
     MultiplayerOnDestroySessionComplete.Broadcast(bWasSuccessful);
 }
 
@@ -224,15 +244,16 @@ void UMultiplayerSessionsSubsystem::OnStartSessionComplete(FName SessionName, bo
 {
     if (!SessionInterface)
     {
+        Logger::Log(FString(TEXT("OnStartSessionComplete: Failed to get SessionInterface")), true);
         return;
     }
     SessionInterface->ClearOnStartSessionCompleteDelegate_Handle(StartSessionCompleteDelegateHandle);
 
     if (!bWasSuccessful)
     {
-        // log
+        Logger::Log(FString(TEXT("OnStartSessionComplete: Failed to start session")), true);
     }
 
+    Logger::Log(FString(TEXT("Started session")), false);
     MultiplayerOnStartSessionComplete.Broadcast(bWasSuccessful);
-    // log
 }
