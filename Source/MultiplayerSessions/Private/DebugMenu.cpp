@@ -1,13 +1,13 @@
 // © 2023 Will Roberts
 
+#include "DebugMenu.h"
+#include "Logger.h"
+
 #include "Components/Button.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "MultiplayerSessionsSubsystem.h"
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
-
-#include "DebugMenu.h"
-#include "Logger.h"
 
 /*************
 Public Methods
