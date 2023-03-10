@@ -10,9 +10,8 @@ Dedicated server functionality is planned. Support for Epic Online Services (as 
 
 Developed with Unreal Engine 5 and C++.
 
-## Polish Burndown List
+## Usage
 
-- Validate Destroy, Start delegates
-- Expose all assumptions as configurables (Steam, result cap, etc.)
-- Polish and decouple debug menu where possible
-- Support more than one session (NAME_GameSession)
+After adding the plugin to your project, use the `WBP_DebugMenu` asset to test functionality.
+
+The `DebugMenu` C++ class serves as a reference implementation of the plugin.
