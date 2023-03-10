@@ -2,6 +2,7 @@
 
 #include "Logger.h"
 
+#include "Engine/Engine.h"
 #include "Logging/LogCategory.h"
 #include "Logging/LogVerbosity.h"
 
