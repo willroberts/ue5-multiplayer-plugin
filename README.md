@@ -23,3 +23,4 @@ Developed with Unreal Engine 5 and C++.
 	- Parameter to mark things as errors (GEngine red color, ULOG 'ERROR:' prefix)
 - Polish and decouple debug menu where possible
 - Port plugin to a new project/repo without added UE content
+- Support more than one session (NAME_GameSession)
