@@ -8,7 +8,7 @@ The plugin also provides a debug menu, and a corresponding Widget for the debug 
 
 Dedicated server functionality is planned. Support for Epic Online Services (as an alternative to Steam) is also planned.
 
-Developed with Unreal Engine 5 and C++.
+Developed with Unreal Engine 5.1 and C++.
 
 ## Usage
 
