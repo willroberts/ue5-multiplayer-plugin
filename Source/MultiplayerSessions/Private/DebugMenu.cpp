@@ -122,7 +122,6 @@ void UDebugMenu::OnCreateSession(bool bWasSuccessful)
         HostButton->SetIsEnabled(true);
         return;
     }
-    Logger::Log(FString(TEXT("Created session successfully")), false);
 
     UWorld* World = GetWorld();
     if (!World)
@@ -215,7 +214,6 @@ void UDebugMenu::OnDestroySession(bool bWasSuccessful)
         Logger::Log(FString(TEXT("OnDestroySession: Failed to destroy session")), true);
         return;
     }
-    Logger::Log(FString(TEXT("Destroyed session successfully")), false);
 }
 
 // OnStartSession is the delegate callback for session initiation.
@@ -227,7 +225,6 @@ void UDebugMenu::OnStartSession(bool bWasSuccessful)
         Logger::Log(FString(TEXT("OnStartSession: Failed to start session")), true);
         return;
     }
-    Logger::Log(FString(TEXT("Started session successfully")), false);
 }
 
 /**************
