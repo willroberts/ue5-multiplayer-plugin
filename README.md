@@ -1,12 +1,10 @@
 # Multiplayer Session Plugin for Unreal Engine
 
-This plugin provides an implementation of Unreal Engine's Online Subsystem.
+This plugin provides an implementation of Unreal Engine's Online Subsystem, supporting multiple providers such as Steam, Epic Online Services, and LAN games.
 
 When using the plugin, players can host and join multiplayer games over the Internet. The hosting player will act as a listen server, resulting in a peer-to-peer network topology.
 
 The plugin also provides a debug menu, and a corresponding Widget for the debug menu.
-
-Dedicated server functionality is planned. Support for Epic Online Services is also planned.
 
 Developed with Unreal Engine 5.1 and modern C++.
 
@@ -21,8 +19,6 @@ The plugin can be used to create, start, find, join, or destroy multiplayer sess
 ## Installation
 
 To install the plugin, simply copy the contents of this repository to the `Plugins/` folder in your project. You can clone the repo, or download an archive from the Releases page.
-
-This plugin may be offered on the Unreal Marketplace in a future update, to further simplify installation.
 
 After reopening the project, you will be prompted to rebuild the plugin.
 
@@ -52,3 +48,8 @@ After installing and configuring the plugin, use the `WBP_DebugMenu` asset to te
 Once this is done, opening your default map will show the multiplayer debug menu, which you can use to host or join sessions.
 
 Additionally, the `DebugMenu` C++ class serves as a reference implementation of the plugin's functionality.
+
+## Planned Improvements
+
+- Dedicated server option
+- Publish plugin to Unreal Marketplace
