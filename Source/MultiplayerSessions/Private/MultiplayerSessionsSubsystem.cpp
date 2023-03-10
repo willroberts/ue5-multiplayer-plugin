@@ -6,6 +6,11 @@
 
 #include "Logger.h"
 
+/*************
+Public Methods
+*************/
+
+// UMultiplayerSessionsSubsystem constructs a new instance, binds delegates, and saves a pointer to the OnlineSubsystem's SessionInterface.
 UMultiplayerSessionsSubsystem::UMultiplayerSessionsSubsystem():
     CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete)),
     FindSessionsCompleteDelegate(FOnFindSessionsCompleteDelegate::CreateUObject(this, &ThisClass::OnFindSessionsComplete)),
@@ -13,17 +18,16 @@ UMultiplayerSessionsSubsystem::UMultiplayerSessionsSubsystem():
     DestroySessionCompleteDelegate(FOnDestroySessionCompleteDelegate::CreateUObject(this, &ThisClass::OnDestroySessionComplete)),
     StartSessionCompleteDelegate(FOnStartSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnStartSessionComplete))
 {
-    IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get();
-    if (!Subsystem)
+    IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
+    if (!OnlineSubsystem)
     {
         return;
     }
 
-    SessionInterface = Subsystem->GetSessionInterface();
+    SessionInterface = OnlineSubsystem->GetSessionInterface();
 }
 
-// Public interface.
-
+// CreateSession destroys any existing session before creating a new online session.
 void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FString MatchType)
 {
     if (!SessionInterface.IsValid())
@@ -67,6 +71,7 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
     }
 }
 
+// FindSessions searches for sessions and saves the results.
 void UMultiplayerSessionsSubsystem::FindSessions(int32 MaxSearchResults)
 {
     if (!SessionInterface.IsValid())
@@ -86,14 +91,17 @@ void UMultiplayerSessionsSubsystem::FindSessions(int32 MaxSearchResults)
     bool Successful = SessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), LastSessionSearch.ToSharedRef());
     if (!Successful)
     {
+        // log
         // Clear the current delegate.
         SessionInterface->ClearOnFindSessionsCompleteDelegate_Handle(FindSessionsCompleteDelegateHandle);
         // Broadcast the custom delegate.
         MultiplayerOnFindSessionsComplete.Broadcast(TArray<FOnlineSessionSearchResult>(), false);
-        return; // ?
+        return;
     }
+    // log
 }
 
+// JoinSession joins the specified game session with a player's unique ID.
 void UMultiplayerSessionsSubsystem::JoinSession(const FOnlineSessionSearchResult &SessionResult)
 {
     if (!SessionInterface.IsValid())
@@ -112,6 +120,7 @@ void UMultiplayerSessionsSubsystem::JoinSession(const FOnlineSessionSearchResult
     }
 }
 
+// DestroySession destroys the current session.
 void UMultiplayerSessionsSubsystem::DestroySession()
 {
     if (!SessionInterface.IsValid())
@@ -129,11 +138,12 @@ void UMultiplayerSessionsSubsystem::DestroySession()
     }
 }
 
+// StartSession marks the online session as in-progress.
 void UMultiplayerSessionsSubsystem::StartSession()
 {
     if (!SessionInterface.IsValid())
     {
-        //MultiplayerOnStartSessionComplete.Broadcast(???);
+        MultiplayerOnStartSessionComplete.Broadcast(false);
         return;
     }
     StartSessionCompleteDelegateHandle = SessionInterface->AddOnStartSessionCompleteDelegate_Handle(StartSessionCompleteDelegate);
@@ -142,14 +152,15 @@ void UMultiplayerSessionsSubsystem::StartSession()
     if (!Successful)
     {
         SessionInterface->ClearOnStartSessionCompleteDelegate_Handle(StartSessionCompleteDelegateHandle);
-        //MultiplayerOnJoinSessionComplete.Broadcast(???);
+        MultiplayerOnStartSessionComplete.Broadcast(false);
     }
 }
 
-//
-// Delegate callbacks.
-//
+/****************
+Protected Methods
+****************/
 
+// OnCreateSessionComplete clears its delegate handle and broadcasts its result.
 void UMultiplayerSessionsSubsystem::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
 {
     if (!SessionInterface)
@@ -161,6 +172,7 @@ void UMultiplayerSessionsSubsystem::OnCreateSessionComplete(FName SessionName, b
     MultiplayerOnCreateSessionComplete.Broadcast(bWasSuccessful);
 }
 
+// OnFindSessionsComplete clears its delegate handle and broadcasts its result.
 void UMultiplayerSessionsSubsystem::OnFindSessionsComplete(bool bWasSuccessful)
 {
     if (!SessionInterface)
@@ -177,6 +189,7 @@ void UMultiplayerSessionsSubsystem::OnFindSessionsComplete(bool bWasSuccessful)
     MultiplayerOnFindSessionsComplete.Broadcast(LastSessionSearch->SearchResults, bWasSuccessful);
 }
 
+// OnJoinSessionComplete clears its delegate handle and broadcasts its result.
 void UMultiplayerSessionsSubsystem::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
 {
     if (!SessionInterface)
@@ -187,6 +200,8 @@ void UMultiplayerSessionsSubsystem::OnJoinSessionComplete(FName SessionName, EOn
     MultiplayerOnJoinSessionComplete.Broadcast(Result);
 }
 
+// OnDestroySessionComplete clears its delegate handle and broadcasts its result.
+// If `bCreateSessionOnDestroy` is true, this also creates a new online session.
 void UMultiplayerSessionsSubsystem::OnDestroySessionComplete(FName SessionName, bool bWasSuccessful)
 {
     if (!SessionInterface)
@@ -204,6 +219,7 @@ void UMultiplayerSessionsSubsystem::OnDestroySessionComplete(FName SessionName, 
     MultiplayerOnDestroySessionComplete.Broadcast(bWasSuccessful);
 }
 
+// OnStartSessionComplete clears its delegate handle and broadcasts its result.
 void UMultiplayerSessionsSubsystem::OnStartSessionComplete(FName SessionName, bool bWasSuccessful)
 {
     if (!SessionInterface)
@@ -212,5 +228,11 @@ void UMultiplayerSessionsSubsystem::OnStartSessionComplete(FName SessionName, bo
     }
     SessionInterface->ClearOnStartSessionCompleteDelegate_Handle(StartSessionCompleteDelegateHandle);
 
-    //MultiplayerOnStartSessionComplete.Broadcast(bWasSuccessful);
+    if (!bWasSuccessful)
+    {
+        // log
+    }
+
+    MultiplayerOnStartSessionComplete.Broadcast(bWasSuccessful);
+    // log
 }
