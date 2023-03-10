@@ -22,7 +22,7 @@ To install the plugin, simply copy the contents of this repository to the `Plugi
 
 After reopening the project, you will be prompted to rebuild the plugin.
 
-## Configuration
+## Configuration (Steam)
 
 Before using the plugin, there are some changes which must be made in the project:
 
@@ -34,6 +34,33 @@ Before using the plugin, there are some changes which must be made in the projec
 [/Script/Engine.GameSession]
 MaxPlayers=64
 ```
+
+## Configuration (Epic Online Services)
+
+1. Enable the `Online Subsystem EOS` and `EOS Shared` plugins.
+2. Configure the `Online Subsystem EOS` plugin as desired by setting the following options:
+  - Artifact
+    - Create a new artifact, and set its name and IDs
+    - Set the default artifact name
+  - EOS Plus Login Settings
+    - Use Epic Account for EOS login
+    - Use Crossplatform User IDs for EOS login
+  - Crossplay Settings
+    - Mirror achievements to EOS
+    - Mirror presence to EAS
+    - Mirror stats to EOS
+    - Use Crossplay sessions
+  - EOS Settings
+    - Enable Overlay
+    - Enable Social Overlay
+3. Update `Config/DefaultEngine.ini` according to [the `Online Subsystem EOS` docs](https://docs.unrealengine.com/5.1/en-US/online-subsystem-eos-plugin-in-unreal-engine/).
+4. Update `Config/DefaultGame.ini` to add the following:
+
+```ini
+[/Script/Engine.GameSession]
+MaxPlayers=64
+```
+
 
 ## Implementation
 
