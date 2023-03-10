@@ -62,6 +62,12 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
     LastSessionSettings->Set(FName("MatchType"), MatchType, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 
     const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController();
+    if (!LocalPlayer)
+    {
+        Logger::Log(FString(TEXT("CreateSession: Failed to get LocalPlayer")), true);
+        return;
+    }
+
     Logger::Log(FString(TEXT("CreateSession: Creating session")), false);
     bool bWasSuccessful = SessionInterface->CreateSession(
         *LocalPlayer->GetPreferredUniqueNetId(),
