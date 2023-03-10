@@ -133,7 +133,13 @@ void UDebugMenu::OnCreateSession(bool bWasSuccessful)
         Logger::Log(FString(TEXT("OnCreateSession: Failed to get World")), true);
         return;
     }
-    World->ServerTravel(LobbyMapPath);
+
+    Logger::Log(FString(TEXT("OnCreateSession: Initiating server travel")), false);
+    bWasSuccessful = World->ServerTravel(LobbyMapPath);
+    if (!bWasSuccessful)
+    {
+        Logger::Log(FString(TEXT("OnCreateSession: Server travel failed")), true);
+    }
 }
 
 // OnFindSessions is the delegate callback for session search.
@@ -206,6 +212,8 @@ void UDebugMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
         Logger::Log(FString(TEXT("OnJoinSession: Failed to get PlayerController")), true);
         return;
     }
+
+    Logger::Log(FString(TEXT("OnJoinSession: Initiating client travel")), false);
     PlayerController->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
 }
 
@@ -271,6 +279,12 @@ void UDebugMenu::HostButtonClicked()
         Logger::Log(FString(TEXT("HostButtonClicked: Failed to get MultiplayerSessionsSubsystem")), true);
         return;
     }
+    Logger::Log(
+        FString::Printf(
+            TEXT("HostButtonClicked: Creating session with match type: %s, connections: %d"),
+            *MatchType,
+            NumPublicConnections
+        ), false);
     MultiplayerSessionsSubsystem->CreateSession(NumPublicConnections, MatchType); 
 }
 
