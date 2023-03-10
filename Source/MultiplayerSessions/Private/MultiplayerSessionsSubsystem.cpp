@@ -57,7 +57,7 @@ void UMultiplayerSessionsSubsystem::CreateSession(int32 NumPublicConnections, FS
     LastSessionSettings->bShouldAdvertise = true;
     LastSessionSettings->bUseLobbiesIfAvailable = true; // Needed for UE 5.0+.
     LastSessionSettings->bUsesPresence = true;
-    LastSessionSettings->BuildUniqueId = 1; // FIXME: Testing value, to share sessions.
+    LastSessionSettings->BuildUniqueId = 1; // Share sessions across builds.
     LastSessionSettings->NumPublicConnections = NumPublicConnections;
     LastSessionSettings->Set(FName("MatchType"), MatchType, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 
