@@ -1,4 +1,4 @@
-// © 2023 Will Roberts
+// ï¿½ 2023 Will Roberts
 
 #pragma once
 
@@ -51,6 +51,7 @@ protected:
 private:
 	void Destroy();
 
+	UPROPERTY()
 	class UMultiplayerSessionsSubsystem* MultiplayerSessionsSubsystem;
 
 	/********************
