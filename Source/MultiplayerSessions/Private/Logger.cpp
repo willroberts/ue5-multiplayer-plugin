@@ -1,4 +1,4 @@
-// © 2023 Will Roberts
+// (c) 2023 Will Roberts
 
 #include "Logger.h"
 
@@ -12,13 +12,9 @@ DEFINE_LOG_CATEGORY(LogMultiplayerSessions);
 Public Methods
 *************/
 
-Logger::Logger()
-{
-}
+Logger::Logger() {}
 
-Logger::~Logger()
-{
-}
+Logger::~Logger() {}
 
 // Log writes a log message to the screen via GEngine and to file log via ULOG.
 void Logger::Log(FString Message, bool bIsError)

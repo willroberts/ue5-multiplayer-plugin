@@ -1,4 +1,4 @@
-// � 2023 Will Roberts
+// (c) 2023 Will Roberts
 
 #pragma once
 
