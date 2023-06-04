@@ -6,7 +6,7 @@ When using the plugin, players can host and join multiplayer games over the Inte
 
 The plugin also provides a debug menu, and a corresponding Widget for the debug menu.
 
-Developed with Unreal Engine 5.1 and modern C++.
+Developed with Unreal Engine 5 and modern C++.
 
 ## Functionality
 
@@ -77,8 +77,3 @@ Once this is done, opening your default map will show the multiplayer debug menu
 You can also use the included `DebugGameMode`, which will print player names and counts as they join or leave the session.
 
 Additionally, the `DebugMenu` C++ class serves as a reference implementation of the plugin's functionality.
-
-## Planned Improvements
-
-- Add dedicated server option
-- Publish plugin to Unreal Marketplace
